@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ZoneDemo</string>
+    <string name="title_activity_main">Zone</string>
+    <string name="title_home">You</string>
+    <string name="title_dashboard">Friends</string>
+    <string name="title_notifications">Discover</string>
+</resources>
