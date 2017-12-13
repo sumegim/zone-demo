@@ -5,10 +5,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -40,16 +45,52 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    private RecyclerView recyclerViewPosts;
+    private PostsAdapter postsAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
-        mTextMessage.setText(welcomemsg);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+
+        AHBottomNavigationItem item1 = new AHBottomNavigationItem("You", R.drawable.account);
+        AHBottomNavigationItem item2 = new AHBottomNavigationItem("Friends", R.drawable.account_multiple);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem("Discover", R.drawable.human_greeting);
+
+        bottomNavigation.addItem(item1);
+        bottomNavigation.addItem(item2);
+        bottomNavigation.addItem(item3);
+
+        bottomNavigation.setBehaviorTranslationEnabled(true);
+        bottomNavigation.setTranslucentNavigationEnabled(true);
+
+        postsAdapter = new PostsAdapter(getApplicationContext());
+        recyclerViewPosts = (RecyclerView) findViewById(
+                R.id.recyclerViewPosts);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+
+        recyclerViewPosts.setLayoutManager(new GridLayoutManager(recyclerViewPosts.getContext(), 1));
+        recyclerViewPosts.setAdapter(postsAdapter);
+
+        initPostsListener();
     }
+    private void initPostsListener() {
+        /*for (int i = 0; i < 10; i++) {
+            Post newPost = new Post("007", "User " + i + " is Listening to:", "Track " + i, "by Big Shaq");
+            postsAdapter.addPost(newPost, "key");
+        }*/
+
+        Post newPost = new Post("007", "Your latest favorite Track is:", "Gucci Gang", "by Lil Pump");
+        Post newPost2 = new Post("007", "New:", "You have a match!", "Check them out!");
+        postsAdapter.addPost(newPost2, "key");
+        postsAdapter.addPost(newPost, "key");
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
