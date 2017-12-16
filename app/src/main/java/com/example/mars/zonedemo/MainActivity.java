@@ -1,60 +1,70 @@
 package com.example.mars.zonedemo;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+import com.aurelhubert.ahbottomnavigation.notification.AHNotification;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
-    private String welcomemsg = "Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName() + "!\n\nIt's time to get in the Zone!";
+    private AHBottomNavigation bottomNavigation;
+    private Toolbar toolbar;
+    private NoSwipePager viewPager;
+    private BottomBarAdapter pagerAdapter;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(welcomemsg);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText("What are your Friends listening to?");
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText("Discover new People and new Music");
-                    return true;
-            }
-            return false;
-        }
-
-    };
-
-    private RecyclerView recyclerViewPosts;
-    private PostsAdapter postsAdapter;
+    private boolean notificationVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AHBottomNavigation bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+        AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES);
 
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
+        //getSupportActionBar().setTitle("Bottom Navigation");
+
+        setupViewPager();
+
+        bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation);
+
+        setupBottomNavStyle();
+        //setupbehavior todo
+
+        addBottomNavigationItems();
+        bottomNavigation.setCurrentItem(0);
+
+        bottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
+            @Override
+            public boolean onTabSelected(int position, boolean wasSelected) {
+//                fragment.updateColor(ContextCompat.getColor(MainActivity.this, colors[position]));
+
+                if (!wasSelected)
+                    viewPager.setCurrentItem(position);
+
+                return true;
+            }
+        });
+
+    }
+
+    private void addBottomNavigationItems(){
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("You", R.drawable.account);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem("Friends", R.drawable.account_multiple);
         AHBottomNavigationItem item3 = new AHBottomNavigationItem("Discover", R.drawable.human_greeting);
@@ -62,34 +72,72 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.addItem(item1);
         bottomNavigation.addItem(item2);
         bottomNavigation.addItem(item3);
+    }
 
+    private void setupBottomNavStyle(){
         bottomNavigation.setBehaviorTranslationEnabled(true);
         bottomNavigation.setTranslucentNavigationEnabled(true);
 
-        postsAdapter = new PostsAdapter(getApplicationContext());
-        recyclerViewPosts = (RecyclerView) findViewById(
-                R.id.recyclerViewPosts);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setReverseLayout(true);
-        layoutManager.setStackFromEnd(true);
+        bottomNavigation.setDefaultBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        bottomNavigation.setAccentColor(getResources().getColor(R.color.colorAccent));
+        bottomNavigation.setInactiveColor(getResources().getColor(R.color.colorDirty));
 
-        recyclerViewPosts.setLayoutManager(new GridLayoutManager(recyclerViewPosts.getContext(), 1));
-        recyclerViewPosts.setAdapter(postsAdapter);
+        // Colors for selected (active) and non-selected items.
+        bottomNavigation.setColoredModeColors(getResources().getColor(R.color.colorAccent),
+                getResources().getColor(R.color.colorPrimaryLight));
 
-        initPostsListener();
+        //  Enables Reveal effect
+        //bottomNavigation.setColored(true);
+
+        //  Displays item Title always (for selected and non-selected items)
+        bottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
     }
-    private void initPostsListener() {
-        /*for (int i = 0; i < 10; i++) {
-            Post newPost = new Post("007", "User " + i + " is Listening to:", "Track " + i, "by Big Shaq");
-            postsAdapter.addPost(newPost, "key");
-        }*/
 
-        Post newPost = new Post("007", "Your latest favorite Track is:", "Gucci Gang", "by Lil Pump");
-        Post newPost2 = new Post("007", "New:", "You have a match!", "Check them out!");
-        postsAdapter.addPost(newPost2, "key");
-        postsAdapter.addPost(newPost, "key");
+    private void setupViewPager(){
+        viewPager = (NoSwipePager) findViewById(R.id.viewpager);
+        viewPager.setPagingEnabled(false);
 
+        pagerAdapter = new BottomBarAdapter(getSupportFragmentManager());
+
+        pagerAdapter.addFragments(createFragment(0));
+        pagerAdapter.addFragments(createFragment(1));
+        pagerAdapter.addFragments(createFragment(2));
+
+        viewPager.setAdapter(pagerAdapter);
     }
+
+    private void createFakeNotification() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                AHNotification notification = new AHNotification.Builder()
+                        .setText("1")
+                        .setBackgroundColor(Color.YELLOW)
+                        .setTextColor(Color.BLACK)
+                        .build();
+                // Adding notification to last item.
+
+                bottomNavigation.setNotification(notification, bottomNavigation.getItemsCount() - 1);
+
+                notificationVisible = true;
+            }
+        }, 1000);
+    }
+
+    @NonNull
+    private DummyFragment createFragment(int p) {
+        DummyFragment fragment = new DummyFragment();
+        fragment.setArguments(passFragmentArguments(p));
+        return fragment;
+    }
+
+    @NonNull
+    private Bundle passFragmentArguments(int p) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("page", p);
+        return bundle;
+    }
+
 
 
     @Override

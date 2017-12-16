@@ -64,10 +64,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         } else {
             viewHolder.imgPost.setVisibility(View.GONE);
         }*/
-        //viewHolder.imgPost.setVisibility(View.VISIBLE); // temp
-        viewHolder.imgPost.setVisibility(View.GONE);
+        viewHolder.imgPost.setVisibility(View.VISIBLE); // temp
+        //viewHolder.imgPost.setVisibility(View.GONE);
 
-        setAnimation(viewHolder.itemView, position);
+        //setAnimation(viewHolder.itemView, position);
     }
 
     @Override
