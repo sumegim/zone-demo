@@ -76,7 +76,23 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     public void addPost(Post post, String key) {
-        postList.add(post);
+        postList.add(0, post);
+        notifyItemInserted(0);
+    }
+
+    public void updatePost(Post post, String key){
+        String newPostUid = post.getUid();
+        notifyDataSetChanged();
+        for (int i = 0; i < postList.size(); i++) {
+            if (postList.get(i).getUid().equals(newPostUid)){
+                postList.set(i, post);
+                notifyItemChanged(i);
+            }
+        }
+    }
+
+    public void removePost(Post post){
+        postList.remove(post);
         notifyDataSetChanged();
     }
 

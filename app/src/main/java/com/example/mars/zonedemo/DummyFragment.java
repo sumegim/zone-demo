@@ -9,6 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 /**
  * Created by mars on 2017.12.15..
  */
@@ -57,17 +63,40 @@ public class DummyFragment extends Fragment {
 
     private void initPostsListener(int p) {
 
-        if(p == 1){
-            for (int i = 0; i < 10; i++) {
-                Post newPost = new Post("007", "User " + i + " is Listening to:", "Track " + i, "by Big Shaq");
-                postsAdapter.addPost(newPost, "key");
-            }
+        if(p == 0){
+
         }
-        if (p == 0) {
-            Post newPost = new Post("007", "Your latest favorite Track is:", "Gucci Gang", "by Lil Pump");
-            Post newPost2 = new Post("007", "New:", "You have a match!", "Check them out!");
-            postsAdapter.addPost(newPost2, "key");
-            postsAdapter.addPost(newPost, "key");
+        if (p == 1) {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("posts");
+            ref.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Post newPost = dataSnapshot.getValue(Post.class);
+                    postsAdapter.addPost(newPost, dataSnapshot.getKey());
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Post newPost = dataSnapshot.getValue(Post.class);
+                    postsAdapter.updatePost(newPost, dataSnapshot.getKey());
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Post newPost = dataSnapshot.getValue(Post.class);
+                    postsAdapter.removePost(newPost);
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
 
     }

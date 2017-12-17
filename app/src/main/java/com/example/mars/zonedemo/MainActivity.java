@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setupBottomNavStyle();
         //setupbehavior todo
 
+        createFakeNotification();
+
         addBottomNavigationItems();
         bottomNavigation.setCurrentItem(0);
 
@@ -62,7 +64,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
     }
+
+    public static final String SERVICECMD = "com.android.music.musicservicecommand";
+
 
     private void addBottomNavigationItems(){
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("You", R.drawable.account);
@@ -79,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setTranslucentNavigationEnabled(true);
 
         bottomNavigation.setDefaultBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        bottomNavigation.setAccentColor(getResources().getColor(R.color.colorAccent));
+        bottomNavigation.setAccentColor(Color.RED);
         bottomNavigation.setInactiveColor(getResources().getColor(R.color.colorDirty));
 
         // Colors for selected (active) and non-selected items.
-        bottomNavigation.setColoredModeColors(getResources().getColor(R.color.colorAccent),
+        bottomNavigation.setColoredModeColors(Color.RED,
                 getResources().getColor(R.color.colorPrimaryLight));
 
         //  Enables Reveal effect
@@ -112,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 AHNotification notification = new AHNotification.Builder()
                         .setText("1")
-                        .setBackgroundColor(Color.YELLOW)
-                        .setTextColor(Color.BLACK)
+                        .setBackgroundColor(Color.RED)
+                        .setTextColor(Color.WHITE)
                         .build();
                 // Adding notification to last item.
 
