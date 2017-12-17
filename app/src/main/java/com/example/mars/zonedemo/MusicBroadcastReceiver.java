@@ -14,6 +14,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class MusicBroadcastReceiver extends BroadcastReceiver {
 
+    boolean busy = false;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -22,12 +24,47 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
         String artist = intent.getStringExtra("artist");
         String album = intent.getStringExtra("album");
         String track = intent.getStringExtra("track");
+        //Log.d("intent URI", intent.toUri(0));
+
+        /*Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            for (String key : bundle.keySet()) {
+                Object value = bundle.get(key);
+                Log.d("values", String.format("%s %s (%s)", key,
+                        value.toString(), value.getClass().getName()));
+            }
+        }*/
+
+        String spotifyUri = intent.getStringExtra("id");
         Log.v("tag", artist + ":" + album + ":" + track);
-        Toast.makeText(context, track, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, spotifyUri, Toast.LENGTH_SHORT).show();
+
+        /*if(busy) return;
+
+        busy = true;
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground( Void... voids ) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                busy = false;
+                return null;
+            }
+        }.execute();*/
 
         //String key = FirebaseDatabase.getInstance().getReference().child("posts").push().getKey();
-        String key = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Post newPost = new Post(key, FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), track, artist);
+        final String key = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final Post newPost = new Post(key, FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), track, artist, spotifyUri);
+
+        /*FirebaseDatabase.getInstance().getReference().child("posts").child(key).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        });*/
 
         FirebaseDatabase.getInstance().getReference().child("posts").child(key).setValue(newPost).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
@@ -35,6 +72,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
 
             }
         });
+
 
 
     }

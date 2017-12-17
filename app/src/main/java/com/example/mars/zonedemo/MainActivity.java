@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         //toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         //noinspection ConstantConditions
-        //getSupportActionBar().setTitle("Bottom Navigation");
+        //getSupportActionBar().setSong_title("Bottom Navigation");
 
         setupViewPager();
 

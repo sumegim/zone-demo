@@ -3,6 +3,7 @@ package com.example.mars.zonedemo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -49,9 +50,11 @@ public class DummyFragment extends Fragment {
         recyclerViewPosts = (RecyclerView) rootView.findViewById(R.id.recyclerViewPosts);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        //layoutManager.setReverseLayout(true);
-        //layoutManager.setStackFromEnd(true);
 
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+
+        recyclerViewPosts.setItemAnimator(new DefaultItemAnimator());
         recyclerViewPosts.setLayoutManager(layoutManager);
         recyclerViewPosts.setAdapter(postsAdapter);
 

@@ -1,6 +1,10 @@
 package com.example.mars.zonedemo;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +13,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +29,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public TextView tvTitle;
         public TextView tvBody;
         public ImageView imgPost;
+        public CardView cardView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -53,10 +59,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-        Post tmpPost = postList.get(position);
-        viewHolder.tvAuthor.setText(tmpPost.getAuthor());
-        viewHolder.tvTitle.setText(tmpPost.getTitle());
-        viewHolder.tvBody.setText(tmpPost.getBody());
+        final Post tmpPost = postList.get(position);
+        viewHolder.tvAuthor.setText(tmpPost.getUserName());
+        viewHolder.tvTitle.setText(tmpPost.getSongTitle());
+        viewHolder.tvBody.setText(tmpPost.getSongArtist());
 
         /*if (!TextUtils.isEmpty(tmpPost.getImageUrl())) {
             Glide.with(context).load(tmpPost.getImageUrl()).into(viewHolder.imgPost);
@@ -68,6 +74,29 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         //viewHolder.imgPost.setVisibility(View.GONE);
 
         //setAnimation(viewHolder.itemView, position);
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+
+            // spotify:track:0osPX8TruIebOhKuG6GK8C
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "Searching ...", Toast.LENGTH_SHORT).show();
+                String uri = tmpPost.getSongSpotifyID();
+
+                if(uri == null){
+
+                    String query = tmpPost.getSongArtist() + " " + tmpPost.getSongTitle();
+                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, query); // query contains search string
+                    context.startActivity(intent);
+                }
+                else if (uri.contains("spotify")) {
+                    Intent launcher = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    context.startActivity(launcher);
+                }
+
+            }
+        });
+
     }
 
     @Override
